@@ -15,7 +15,7 @@ const MyNft = () => {
 
     useEffect(() => {
         getAllAvailableNFTs();
-        getAllAvailableNFTsMetaData();
+        //getAllAvailableNFTsMetaData();
     }, []);
 
     const getAllAvailableNFTs = async () => {
@@ -59,7 +59,6 @@ const MyNft = () => {
             let { nfts, nativeBalance } = resp.data;
             setMintData(nfts);
             setBalance(nativeBalance);
-            console.log(nfts);
             getAllNFTs(nfts);
         } catch (error) {
             console.log(error);
@@ -81,9 +80,15 @@ const MyNft = () => {
                     },
                 }
             );
-            let data = await axios.get(
+            /*let data = await axios.get(
                 `${NFTdata?.data.metaplex?.metadataUri}`
             );
+            */
+            let data = await fetch(`${NFTdata?.data.metaplex?.metadataUri}`)
+            .then(response => response.json())    // one extra step
+            .then(data)
+            .catch(error => console.error(error));
+            
             NFTdata.data = { ...NFTdata.data, metaAPIData: data.data };
             NFTdata.data.metaAPIData = {
                 ...NFTdata.data.metaAPIData,
@@ -93,7 +98,6 @@ const MyNft = () => {
         }
 
         setTotalNFts(totalNFTs);
-        console.log(totalNFTs);
     };
 
     const onSelectTab = (key) => {
@@ -179,14 +183,15 @@ const MyNft = () => {
                                                     <Col key={idx} md={3} className="mb-3">
                                                         <Card>
                                                             <Card.Body>
+                                                                {val.image}
                                                                 <img
                                                                     className="ic-card-img-top mb-2"
-                                                                    src={val?.metadata?.image || val?.metadata[0]?.image}
+                                                                    src={val.image}
                                                                     alt="Card image cap"
                                                                 />
                                                                 <div className="ic-card-body">
                                                                     <h5 className="ic-card-title">
-                                                                        {val?.metadata?.name || val?.metadata[0]?.name}
+                                                                        {val.name}
                                                                     </h5>
                                                                     <div className="mb-2">
                                                                         Price:
@@ -196,9 +201,7 @@ const MyNft = () => {
                                                                             width="20px"
                                                                         />
                                                                         <span>
-                                                                            {val?.metadata?.NFTPrice ||
-                                                                                val?.metadata[0]?.NFTPrice ||
-                                                                                0}
+                                                                        {val.amountRaw}
                                                                         </span>
                                                                     </div>
                                                                 </div>
