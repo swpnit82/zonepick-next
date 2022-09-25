@@ -15,7 +15,7 @@ const MyNft = () => {
 
     useEffect(() => {
         getAllAvailableNFTs();
-        getAllAvailableNFTsMetaData();
+        //getAllAvailableNFTsMetaData();
     }, []);
 
     const getAllAvailableNFTs = async () => {
@@ -59,7 +59,6 @@ const MyNft = () => {
             let { nfts, nativeBalance } = resp.data;
             setMintData(nfts);
             setBalance(nativeBalance);
-            console.log(nfts);
             getAllNFTs(nfts);
         } catch (error) {
             console.log(error);
@@ -81,19 +80,26 @@ const MyNft = () => {
                     },
                 }
             );
-            let data = await axios.get(
+            /*let data = await axios.get(
                 `${NFTdata?.data.metaplex?.metadataUri}`
             );
+            */
+            let data = await fetch(`${NFTdata?.data.metaplex?.metadataUri}`)
+            .then(response => response.json())    // one extra step
+            .then(data)
+            .catch(error => console.error(error));
+            
             NFTdata.data = { ...NFTdata.data, metaAPIData: data.data };
+            
             NFTdata.data.metaAPIData = {
                 ...NFTdata.data.metaAPIData,
                 price: mintData[i].amountRaw,
             };
+            
             totalNFTs.push(NFTdata.data);
         }
-
+        
         setTotalNFts(totalNFTs);
-        console.log(totalNFTs);
     };
 
     const onSelectTab = (key) => {
@@ -154,6 +160,14 @@ const MyNft = () => {
                                                                                     val?.metadata[0]?.NFTPrice ||
                                                                                     0}
                                                                             </span>
+                                                                            
+                                                                        </div>
+                                                                        <div className="mb-2">
+                                                                        Link: 
+                                                                        <span>
+                                                                            <a href={`https://testnets.opensea.io/assets/rinkeby/${val?.token_address}/${val?.token_id}`} target="_blank"> Details</a>
+                                                                           
+                                                                            </span>
                                                                         </div>
                                                                     </div>
                                                                     <Button variant="deep-purple-900" className="w-100">
@@ -181,12 +195,12 @@ const MyNft = () => {
                                                             <Card.Body>
                                                                 <img
                                                                     className="ic-card-img-top mb-2"
-                                                                    src={val?.metadata?.image || val?.metadata[0]?.image}
+                                                                    src={val.metaAPIData.image}
                                                                     alt="Card image cap"
                                                                 />
                                                                 <div className="ic-card-body">
                                                                     <h5 className="ic-card-title">
-                                                                        {val?.metadata?.name || val?.metadata[0]?.name}
+                                                                        {val.name}
                                                                     </h5>
                                                                     <div className="mb-2">
                                                                         Price:
@@ -196,10 +210,15 @@ const MyNft = () => {
                                                                             width="20px"
                                                                         />
                                                                         <span>
-                                                                            {val?.metadata?.NFTPrice ||
-                                                                                val?.metadata[0]?.NFTPrice ||
-                                                                                0}
+                                                                        {val.metaAPIData.price}
                                                                         </span>
+                                                                    </div>
+                                                                    <div className="mb-2">
+                                                                        Link: 
+                                                                        <span>
+                                                                            <a href={`https://solscan.io/token/${val?.mint}?cluster=devnet`} target="_blank"> Details</a>
+                                                                           
+                                                                            </span>
                                                                     </div>
                                                                 </div>
                                                                 <Button variant="deep-purple-900" className="w-100">
